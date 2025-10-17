@@ -1,0 +1,22 @@
+{
+  "name": "skyblue",
+  "version": "1.0.0",
+  "description": "flocking simulation",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/LikeTheWolf/skyblue.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/LikeTheWolf/skyblue/issues"
+  },
+  "homepage": "https://github.com/LikeTheWolf/skyblue#readme",
+  "dependencies": {
+    "p5": "^2.0.5"
+  }
+}
