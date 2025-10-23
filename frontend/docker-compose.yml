@@ -1,0 +1,8 @@
+services:
+  sim-frontend:
+    build: .
+    ports:
+      - "4001:4001"
+    volumes:
+      - /home/sav2748/ssl:/sim/ssl:ro  # Mount SSL directory to the container folder
+    command: ["npx", "http-server", "./build", "-p", "4001", "--ssl", "--cert", "/sim/ssl/cloudflare-origin.pem", "--key", "/sim/ssl/cloudflare-origin.key"]
