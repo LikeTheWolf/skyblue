@@ -1,13 +1,12 @@
-FROM node:20-alpine
+FROM node:22-alpine
 
 # Set working directory
 WORKDIR /sim
 
 # Copy package files
-COPY package*.json ./
-
-# Install dependencies
-RUN npm install
+# Copy exact dependency graph
+COPY package.json package-lock.json ./
+RUN npm ci
 
 # Copy the rest of the files
 COPY . .
