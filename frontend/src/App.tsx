@@ -6,7 +6,7 @@ function App() {
   return (
     <div style={{ padding: 16 }}>
       <h1>Flocking Simulation</h1>
-      <P5Draw draw={draw} width={640} height={480} />
+      <P5Draw draw={draw} width={1110} height={480} />
     </div>
   );
 }
