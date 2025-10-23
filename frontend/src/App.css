@@ -41,3 +41,50 @@
   background: linear-gradient(180deg, rgba(255,255,255,0.12), rgba(255,255,255,0.04));
   box-shadow: 0 6px 20px rgba(0,0,0,0.25);
 }
+
+.controls {
+  position: fixed;
+  top: 12px;
+  right: 12px;
+  display: flex;
+  gap: 8px;
+  z-index: 5;
+}
+
+.ctrl-label {
+  align-self: center;
+  color: var(--brand-muted);
+  font-weight: 600;
+  font-size: 12px;
+  padding-right: 4px;
+}
+
+.ctrl-btn {
+  appearance: none;
+  border: 1px solid rgba(255,255,255,0.18);
+  color: var(--brand);
+  background: linear-gradient(180deg, rgba(255,255,255,0.10), rgba(255,255,255,0.03));
+  border-radius: 10px;
+  padding: 6px 10px;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.3px;
+  backdrop-filter: blur(8px);
+  box-shadow: 0 6px 18px rgba(0,0,0,0.25);
+  cursor: pointer;
+  transition: transform 120ms ease, background 120ms ease, border-color 120ms ease;
+}
+
+.ctrl-btn.active,
+.ctrl-btn[aria-pressed="true"] {
+  border-color: rgba(255,255,255,0.35);
+  background: linear-gradient(180deg, rgba(255,255,255,0.18), rgba(255,255,255,0.08));
+  box-shadow: 0 8px 22px rgba(0,0,0,0.35);
+  /* Mirror the click/focus halo on initial selected state */
+  outline: 2px solid rgba(255,255,255,0.35);
+  outline-offset: 2px;
+}
+
+.ctrl-btn:hover { transform: translateY(-1px); }
+.ctrl-btn:active { transform: translateY(0); }
+.ctrl-btn:focus { outline: 2px solid rgba(255,255,255,0.35); outline-offset: 2px; }

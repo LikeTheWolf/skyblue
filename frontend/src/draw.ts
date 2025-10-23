@@ -1,7 +1,8 @@
 import p5 from "p5";
 import { Boid } from "./boid";
 
-export default function draw(p: p5) {
+export default function makeDraw(boidCount: number) {
+  return function draw(p: p5) {
   const flock: Boid[] = [];
 
   type Ripple = {
@@ -17,7 +18,7 @@ export default function draw(p: p5) {
 
   return {
     setup() {
-      for(let i = 0; i < 400; i++){
+      for(let i = 0; i < boidCount; i++){
         flock.push(new Boid(p));
       }
       // Disruptive ripple on click/touch to scatter boids
@@ -33,8 +34,14 @@ export default function draw(p: p5) {
           strength: 0.38, // stronger disruption
         });
       };
-      p.mousePressed = () => spawn(p.mouseX, p.mouseY);
-      (p as any).touchStarted = () => { const t0 = (p as any).touches && (p as any).touches[0]; if (t0) spawn(t0.x, t0.y); };
+      const overControls = (x: number, y: number) => {
+        const el = document.querySelector('.controls') as HTMLElement | null;
+        if (!el) return false;
+        const r = el.getBoundingClientRect();
+        return x >= r.left && x <= r.right && y >= r.top && y <= r.bottom;
+      };
+      p.mousePressed = () => { if (!overControls(p.mouseX, p.mouseY)) spawn(p.mouseX, p.mouseY); };
+      (p as any).touchStarted = () => { const t0 = (p as any).touches && (p as any).touches[0]; if (t0 && !overControls(t0.x, t0.y)) spawn(t0.x, t0.y); };
     },
     draw() {
       // clear to transparent so the CSS background shows through
@@ -96,5 +103,6 @@ export default function draw(p: p5) {
         boid.show();
       }
     },
+  };
   };
 }
