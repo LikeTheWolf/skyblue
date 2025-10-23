@@ -248,7 +248,7 @@ export class Boid {
     p.translate(this.position.x, this.position.y);
     p.rotate(angle);
     p.noStroke();
-    p.fill(55);
+    p.fill(255);
     // Triangle pointing along +X (nose forward)
     p.triangle(r * 2, 0, -r, -r, -r, r);
     p.pop();
