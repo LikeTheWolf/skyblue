@@ -6,7 +6,7 @@ export default function draw(p: p5) {
 
   return {
     setup() {
-      for(let i = 0; i < 100; i++){
+      for(let i = 0; i < 400; i++){
         flock.push(new Boid(p));
       }
     },

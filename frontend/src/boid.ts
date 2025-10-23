@@ -88,33 +88,72 @@ export class Boid {
   private steeringFromNeighbors(
     boids: Boid[],
     radius: number,
-    accumulate: (acc: p5.Vector, other: Boid, d: number) => void,
+    accumulate: (acc: p5.Vector, other: Boid, dOrD2: number) => void,
     options?: { postAverage?: (acc: p5.Vector) => void; forceLimit?: number; useFOV?: boolean; limitN?: number; normalizeToMaxSpeed?: boolean; subtractVelocity?: boolean }
   ): p5.Vector {
     const p = this.p;
     const steering = p.createVector();
-    const pool: Array<{ other: Boid, d: number }> = [];
+    const limit = options?.limitN ?? boids.length;
+    const k = limit;
+    const bestIdx: number[] = new Array(k).fill(-1);
+    const bestD2: number[] = new Array(k).fill(Infinity);
 
-    for (const other of boids) {
+    const radius2 = radius * radius;
+    // Precompute FOV dot threshold (squared) and forward unit if needed
+    let fx = 0, fy = 0, cosHalf2 = 0, useFOV = !!options?.useFOV;
+    if (useFOV) {
+      const mag = this.velocity.mag();
+      if (mag > 0) {
+        fx = this.velocity.x / mag;
+        fy = this.velocity.y / mag;
+      } else {
+        useFOV = false; // no forward if not moving
+      }
+      const cosHalf = Math.cos(this.fov / 2);
+      cosHalf2 = cosHalf * cosHalf;
+    }
+
+    // Scan all boids; track k smallest distances without sorting whole list
+    for (let i = 0; i < boids.length; i++) {
+      const other = boids[i];
       if (other === this) continue;
-      const d = p.dist(this.position.x, this.position.y, other.position.x, other.position.y);
-      if (d < radius) {
-        if (!options?.useFOV || this.inFOV(other.position)) {
-          pool.push({ other, d });
-        }
+      const dx = this.position.x - other.position.x;
+      const dy = this.position.y - other.position.y;
+      const d2 = dx * dx + dy * dy;
+      if (d2 === 0 || d2 >= radius2) continue;
+      if (useFOV) {
+        const dot = -(fx * dx + fy * dy); // since dx,dy = self - other, invert sign
+        if (dot <= 0) continue; // behind
+        // Compare squared to avoid sqrt: (dot^2 >= cos^2 * d2)
+        if ((dot * dot) < (cosHalf2 * d2)) continue;
+      }
+      // find worst slot
+      let worst = 0;
+      for (let j = 1; j < k; j++) {
+        if (bestD2[j] > bestD2[worst]) worst = j;
+      }
+      if (d2 < bestD2[worst]) {
+        bestD2[worst] = d2;
+        bestIdx[worst] = i;
       }
     }
 
-    pool.sort((a, b) => a.d - b.d);
-    const limit = options?.limitN ?? pool.length;
-    const picked = pool.slice(0, limit);
+    // Build selected list from best arrays (filter out empty slots)
+    const selectedIdx: number[] = [];
+    for (let j = 0; j < k; j++) if (bestIdx[j] !== -1) selectedIdx.push(bestIdx[j]);
     // Randomly drop a neighbor or two to avoid rigid consensus
-    let selected = picked.filter(() => this.p.random() > 0.25);
-    if (selected.length === 0 && picked.length > 0) selected = [picked[0]];
+    let selected = selectedIdx.filter(() => this.p.random() > 0.25);
+    if (selected.length === 0 && selectedIdx.length > 0) selected = [selectedIdx[0]];
 
     if (selected.length > 0) {
-      for (const { other, d } of selected) {
-        accumulate(steering, other, d);
+      for (let s = 0; s < selected.length; s++) {
+        const idx = selected[s];
+        const other = boids[idx];
+        // Recompute squared distance (cheap) for accumulator
+        const dx = this.position.x - other.position.x;
+        const dy = this.position.y - other.position.y;
+        const d2 = dx * dx + dy * dy;
+        accumulate(steering, other, d2);
       }
       steering.div(selected.length);
       if (options?.postAverage) options.postAverage(steering);
@@ -155,9 +194,9 @@ export class Boid {
     return this.steeringFromNeighbors(
       boids,
       40,
-      (acc, other, d) => {
+      (acc, other, d2) => {
         const diff = p5.Vector.sub(this.position, other.position);
-        diff.div(d * d + 1e-6);
+        diff.div(d2 + 1e-6);
         acc.add(diff);
       },
       { forceLimit: 2 * this.maxForce, limitN: this.neighborCount, normalizeToMaxSpeed: false, useFOV: false, subtractVelocity: false }
