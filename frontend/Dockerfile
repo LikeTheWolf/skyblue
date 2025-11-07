@@ -14,8 +14,8 @@ COPY . .
 # Build the React app
 RUN npm run build
 
-# Expose port 4001
-EXPOSE 4001
+# Expose port 4002
+EXPOSE 4002
 
 # Serve the app with http-server
-CMD ["npx", "http-server", "./build", "-p", "4001", "--ssl", "--cert", "/sim/ssl/cloudflare-origin.pem", "--key", "/sim/ssl/cloudflare-origin.key"]
+CMD ["npx", "http-server", "./build", "-p", "4002", "--ssl", "--cert", "/sim/ssl/cloudflare-origin.pem", "--key", "/sim/ssl/cloudflare-origin.key"]
