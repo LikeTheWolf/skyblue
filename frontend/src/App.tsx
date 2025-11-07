@@ -1,7 +1,7 @@
+import { useMemo, useState } from 'react';
 import './App.css';
 import P5Draw from './components/P5Draw';
 import makeDraw from "./draw";
-import { useMemo, useState } from 'react';
 
 function App() {
   const [boids, setBoids] = useState<number>(100);
@@ -10,7 +10,7 @@ function App() {
   return (
     <div className="app-root">
       <P5Draw draw={draw} />
-      <div className="brand">Flocking Simulation</div>
+      <div className="brand">Boids Simulation</div>
       <div className="controls" role="group" aria-label="Boid count">
         <span className="ctrl-label" aria-hidden>Boids</span>
         <button
